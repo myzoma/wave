@@ -538,7 +538,7 @@
                 ]);
                 
                 // تحليل بيانات الشموع وإنشاء أنماط
-                const patterns = analyzeKlineData(klineData);
+                const patterns = analyzeKlineData(klineData, currentPrice);
                 
                 // ترتيب الأنماط حسب مستوى الثقة
                 patterns.sort((a, b) => b.confidence - a.confidence);
@@ -564,7 +564,7 @@
         }
         
         // دالة تحليل بيانات الشموع
-        function analyzeKlineData(klineData) {
+        function analyzeKlineData(klineData, realCurrentPrice) {
             const patterns = [];
             const patternTypes = ['موجة دافعة', 'موجة تصحيحية', 'مثلث متماثل', 'إسفين صاعد', 'إسفين هابط'];
             const directions = ['صاعد', 'هابط'];
@@ -589,8 +589,8 @@
                 const priceChange = Math.abs(endPrice - startPrice) / startPrice;
                 const baseConfidence = Math.min(90, 60 + (priceChange * 1000));
                 
-                // حساب الهدف بطريقة واقعية أكثر
-                const currentPrice = prices[prices.length - 1]; // السعر الحالي
+                // استخدام السعر الحقيقي الممرر كمعامل
+                const currentPrice = realCurrentPrice || prices[prices.length - 1];
                 let waveTarget;
                 
                 if (direction === 'صاعد') {
@@ -610,7 +610,7 @@
                     startIndex: startIdx,
                     endIndex: Math.min(endIdx, prices.length - 1),
                     waveLength: (Math.abs(endPrice - startPrice) / startPrice) * 100,
-                    target: waveTarget.toFixed(2)
+                    target: waveTarget.toFixed(4)
                 });
             }
             
