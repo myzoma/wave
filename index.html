@@ -359,18 +359,18 @@
         let isAnalyzing = false;
         
         // حساب عدد الشموع المثلى حسب الفريم (تحليل 24 ساعة)
-       function getOptimalCandleCount(interval) {
-    const candleCounts = {
-        '15m': 200, 
-        '30m': 300,  
-        '1h': 400,   
-        '4h': 200,    
-        '1d': 100,    
-        '1w': 20      
-    };
-    return candleCounts[interval] || 300; // رقم افتراضي لو الإطار غير موجود
-}
-
+        function getOptimalCandleCount(interval) {
+            const candleCounts = {
+                '15m': 96,   // 24 ساعة ÷ 15 دقيقة = 96
+                '30m': 48,   // 24 ساعة ÷ 30 دقيقة = 48
+                '1h': 24,    // 24 ساعة ÷ 1 ساعة = 24
+                '4h': 6,     // 24 ساعة ÷ 4 ساعات = 6
+                '1d': 1,     // 1 يوم
+                '1w': 1      // 1 أسبوع
+            };
+            
+            return candleCounts[interval] || 24;
+        }
         
         // تحديث عدد الشموع عند تغيير الفريم
         document.getElementById('intervalSelect').addEventListener('change', function() {
@@ -481,9 +481,10 @@
                                     <span>${pattern.direction}</span>
                                 </div>
                                 <div class="pattern-details">
-                                    <p><strong>نقطة البداية:</strong> ${pattern.startIndex}</p>
-                                    <p><strong>نقطة النهاية:</strong> ${pattern.endIndex}</p>
-                                    <p><strong>طول الموجة:</strong> ${pattern.waveLength.toFixed(2)}%</p>
+                                    <p><strong>📍 نقطة البداية:</strong> الشمعة رقم ${pattern.startIndex} (من ${pattern.totalCandles} شمعة)</p>
+                                    <p><strong>🏁 نقطة النهاية:</strong> الشمعة رقم ${pattern.endIndex} (من ${pattern.totalCandles} شمعة)</p>
+                                    <p><strong>📏 المدة الزمنية:</strong> ${pattern.endIndex - pattern.startIndex} شمعة</p>
+                                    <p><strong>📊 طول الموجة:</strong> ${pattern.waveLength.toFixed(2)}%</p>
                                     <p><strong>🎯 الهدف المتوقع:</strong> $${pattern.target}</p>
                                 </div>
                             </div>
