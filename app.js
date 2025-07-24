@@ -26,10 +26,12 @@ async function loadData(interval) {
     // عرض النتائج بشكل منسق
     let outputText = '';
 
-    if (result.error) {
-      outputText = 'خطأ: ' + result.error;
-    } else {
-      outputText = `
+   if (result.error) {
+  outputText = 'خطأ: ' + result.error;
+} else if (!result.data) {
+  outputText = 'لم يتم العثور على بيانات مناسبة من التحليل.';
+} else {
+  outputText = `
 نتائج التحليل:
 --------------------------
 العملة: BTCUSDT
@@ -43,8 +45,9 @@ async function loadData(interval) {
 - أعلى سعر خلال الفترة: ${result.data.high}
 - أدنى سعر خلال الفترة: ${result.data.low}
 `;
-    }
+}
 
+document.getElementById('output').innerHTML = `<pre>${outputText}</pre>`;
 document.getElementById('output').innerHTML = `<pre>${outputText}</pre>`;  } catch (err) {
     document.getElementById('output').textContent = 'خطأ في تحميل البيانات: ' + err.message;
   }
