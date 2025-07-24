@@ -1,0 +1,19 @@
+{
+  "name": "elliott-wave-analyzer",
+  "version": "1.0.0",
+  "description": "Elliott Wave Analysis with Binance API",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "crypto": "^1.0.1",
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "keywords": ["elliott-wave", "binance", "trading", "analysis"],
+  "author": "Your Name",
+  "license": "MIT"
+}
