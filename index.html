@@ -463,6 +463,7 @@
                                     <p><strong>نقطة البداية:</strong> ${pattern.startIndex}</p>
                                     <p><strong>نقطة النهاية:</strong> ${pattern.endIndex}</p>
                                     <p><strong>طول الموجة:</strong> ${pattern.waveLength.toFixed(2)}%</p>
+                                    <p><strong>🎯 الهدف المتوقع:</strong> $${pattern.target}</p>
                                 </div>
                             </div>
                         `).join('')}
@@ -588,14 +589,16 @@
                 const priceChange = Math.abs(endPrice - startPrice) / startPrice;
                 const baseConfidence = Math.min(90, 60 + (priceChange * 1000));
                 
-                patterns.push({
-                    type: patternTypes[Math.floor(Math.random() * patternTypes.length)],
-                    direction: direction,
-                    confidence: baseConfidence + (Math.random() * 20 - 10),
-                    startIndex: startIdx,
-                    endIndex: Math.min(endIdx, prices.length - 1),
-                    waveLength: (Math.abs(endPrice - startPrice) / startPrice) * 100
-                });
+                    	const waveTarget = direction === 'صاعد' ? endPrice * 1.05 : endPrice * 0.95;
+                    	patterns.push({
+                    		type: patternTypes[Math.floor(Math.random() * patternTypes.length)],
+                    		direction: direction,
+                    		confidence: baseConfidence + (Math.random() * 20 - 10),
+                    		startIndex: startIdx,
+                    		endIndex: Math.min(endIdx, prices.length - 1),
+                    		waveLength: (Math.abs(endPrice - startPrice) / startPrice) * 100,
+                    		target: waveTarget.toFixed(2)
+                    });
             }
             
             return patterns;
