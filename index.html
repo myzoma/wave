@@ -637,7 +637,8 @@
                     startIndex: startIdx,
                     endIndex: Math.min(endIdx, prices.length - 1),
                     waveLength: (Math.abs(endPrice - startPrice) / startPrice) * 100,
-                    target: waveTarget.toFixed(4)
+                    target: waveTarget.toFixed(4),
+                    totalCandles: klineData.length
                 });
             }
             
