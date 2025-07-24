@@ -358,18 +358,18 @@
         let continuousAnalysisInterval = null;
         let isAnalyzing = false;
         
-        // حساب عدد الشموع المثلى حسب الفريم (تحليل 7 أيام)
+        // حساب عدد الشموع المثلى حسب الفريم (تحليل 24 ساعة)
         function getOptimalCandleCount(interval) {
             const candleCounts = {
-                '15m': 672,  // 7 أيام × 24 ساعة × 4 شموع = 672 شمعة
-                '30m': 336,  // 7 أيام × 24 ساعة × 2 شموع = 336 شمعة
-                '1h': 168,   // 7 أيام × 24 ساعة = 168 شمعة
-                '4h': 42,    // 7 أيام × 6 شموع = 42 شمعة
-                '1d': 7,     // 7 أيام = 7 شموع
-                '1w': 4      // 4 أسابيع = شهر
+                '15m': 96,   // 24 ساعة ÷ 15 دقيقة = 96
+                '30m': 48,   // 24 ساعة ÷ 30 دقيقة = 48
+                '1h': 24,    // 24 ساعة ÷ 1 ساعة = 24
+                '4h': 6,     // 24 ساعة ÷ 4 ساعات = 6
+                '1d': 1,     // 1 يوم
+                '1w': 1      // 1 أسبوع
             };
             
-            return candleCounts[interval] || 168;
+            return candleCounts[interval] || 24;
         }
         
         // تحديث عدد الشموع عند تغيير الفريم
@@ -475,7 +475,7 @@
                                     </div>
                                 </div>
                                 <div class="pattern-direction">
-                                                                      <span class="direction-arrow ${pattern.direction === 'صاعد' ? 'direction-up' : 'direction-down'}">
+                                    <span class="direction-arrow ${pattern.direction === 'صاعد' ? 'direction-up' : 'direction-down'}">
                                         ${pattern.direction === 'صاعد' ? '📈' : '📉'}
                                     </span>
                                     <span>${pattern.direction}</span>
