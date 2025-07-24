@@ -45,8 +45,7 @@ async function loadData(interval) {
 `;
     }
 
-    document.getElementById('output').textContent = outputText;
-  } catch (err) {
+document.getElementById('output').innerHTML = `<pre>${outputText}</pre>`;  } catch (err) {
     document.getElementById('output').textContent = 'خطأ في تحميل البيانات: ' + err.message;
   }
 }
