@@ -34,6 +34,7 @@ class WebBinanceAPI {
 
         } catch (error) {
             console.error('خطأ في الحصول على البيانات:', error.message);
+            throw error;
         }
     }
 
@@ -56,9 +57,8 @@ class WebBinanceAPI {
 
         } catch (error) {
             console.error('خطأ في الحصول على السعر:', error.message);
+            throw error;
         }
-    }
-        return data;
     }
 
     // Test connection
