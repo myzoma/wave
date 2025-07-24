@@ -359,18 +359,18 @@
         let isAnalyzing = false;
         
         // حساب عدد الشموع المثلى حسب الفريم (تحليل 7 أيام)
-       function getOptimalCandleCount(interval) {
-    const candleCounts = {
-        '15m': 400,
-        '30m': 350,
-        '1h': 350,
-        '4h': 200,
-        '1d': 120,
-        '1w': 50
-    };
-    return candleCounts[interval] || 200; // افتراضي إذا ما تعرف الفريم
-}
-
+        function getOptimalCandleCount(interval) {
+            const candleCounts = {
+                '15m': 672,  // 7 أيام × 24 ساعة × 4 شموع = 672 شمعة
+                '30m': 336,  // 7 أيام × 24 ساعة × 2 شموع = 336 شمعة
+                '1h': 168,   // 7 أيام × 24 ساعة = 168 شمعة
+                '4h': 42,    // 7 أيام × 6 شموع = 42 شمعة
+                '1d': 7,     // 7 أيام = 7 شموع
+                '1w': 4      // 4 أسابيع = شهر
+            };
+            
+            return candleCounts[interval] || 168;
+        }
         
         // تحديث عدد الشموع عند تغيير الفريم
         document.getElementById('intervalSelect').addEventListener('change', function() {
@@ -491,7 +491,12 @@
                     </div>
 
                     <div class="summary-box">
-                        <h3>📝 ملخص التحليل</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3>📝 ملخص التحليل</h3>
+                            <button class="btn-secondary" onclick="copyAnalysis()" style="min-width: auto; padding: 8px 16px;">
+                                📋 نسخ التحليل
+                            </button>
+                        </div>
                         <p>${analysis.summary}</p>
                         <p><strong>عدد الأنماط المكتشفة:</strong> ${analysis.patterns.length}</p>
                         <p><strong>وقت التحليل:</strong> ${new Date().toLocaleString('ar-SA')}</p>
@@ -638,6 +643,53 @@
             return patterns;
         }
 
+        // دالة نسخ التحليل
+        async function copyAnalysis() {
+            try {
+                const resultsDiv = document.getElementById('results');
+                if (!resultsDiv || resultsDiv.style.display === 'none') {
+                    showError('لا توجد نتائج لنسخها');
+                    return;
+                }
+                
+                // استخراج بيانات التحليل
+                const symbol = document.querySelector('.symbol-info h2')?.textContent || 'غير محدد';
+                const price = document.querySelector('.symbol-info .price')?.textContent || 'غير محدد';
+                const summary = document.querySelector('.summary-box p')?.textContent || 'غير متوفر';
+                const patterns = document.querySelectorAll('.pattern-card');
+                
+                let analysisText = `🌊 تحليل Elliott Wave\n`;
+                analysisText += `────────────────────\n`;
+                analysisText += `📊 الرمز: ${symbol}\n`;
+                analysisText += `💰 السعر: ${price}\n\n`;
+                
+                analysisText += `📝 ملخص التحليل:\n${summary}\n\n`;
+                
+                if (patterns.length > 0) {
+                    analysisText += `📈 الأنماط المكتشفة:\n`;
+                    patterns.forEach((pattern, index) => {
+                        const type = pattern.querySelector('.pattern-type')?.textContent || '';
+                        const confidence = pattern.querySelector('.confidence')?.textContent || '';
+                        const direction = pattern.querySelector('.pattern-direction span:last-child')?.textContent || '';
+                        const target = pattern.querySelector('.pattern-details p:last-child')?.textContent?.replace('🎯 الهدف المتوقع: ', '') || '';
+                        
+                        analysisText += `${index + 1}. ${type} ${direction} - الثقة: ${confidence}\n`;
+                        analysisText += `   🎯 الهدف: ${target}\n\n`;
+                    });
+                }
+                
+                analysisText += `────────────────────\n`;
+                analysisText += `🕰️ وقت التحليل: ${new Date().toLocaleString('ar-SA')}`;
+                
+                await navigator.clipboard.writeText(analysisText);
+                showInfo('✅ تم نسخ التحليل بنجاح!');
+                
+            } catch (error) {
+                console.error('خطأ في النسخ:', error);
+                showError('فشل في نسخ التحليل. تأكد من أن المتصفح يدعم عملية النسخ.');
+            }
+        }
+        
         // تشغيل تحليل تلقائي عند تحميل الصفحة
         window.addEventListener('load', () => {
             console.log('تم تحميل محلل Elliott Wave بنجاح');
