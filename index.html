@@ -357,6 +357,27 @@
     <script>
         let continuousAnalysisInterval = null;
         let isAnalyzing = false;
+        
+        // حساب عدد الشموع المثلى حسب الفريم
+        function getOptimalCandleCount(interval) {
+            const candleCounts = {
+                '15m': 200,  // 50 ساعة = يومين ونصف
+                '30m': 120,  // 60 ساعة = يومين ونصف
+                '1h': 100,   // 100 ساعة = 4 أيام
+                '4h': 72,    // 288 ساعة = 12 يوم
+                '1d': 30,    // 30 يوم = شهر
+                '1w': 24     // 24 أسبوع = 6 أشهر
+            };
+            
+            return candleCounts[interval] || 100;
+        }
+        
+        // تحديث عدد الشموع عند تغيير الفريم
+        document.getElementById('intervalSelect').addEventListener('change', function() {
+            const selectedInterval = this.value;
+            const optimalCount = getOptimalCandleCount(selectedInterval);
+            document.getElementById('limitInput').value = optimalCount;
+        });
 
         // دالة تحليل الرمز
         async function analyzeSymbol() {
@@ -367,7 +388,7 @@
 
             const symbol = document.getElementById('symbolSelect').value;
             const interval = document.getElementById('intervalSelect').value;
-            const limit = document.getElementById('limitInput').value;
+            const limit = getOptimalCandleCount(interval);
 
             showLoading('جاري تحليل ' + symbol + '...');
             isAnalyzing = true;
