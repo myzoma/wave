@@ -34,10 +34,6 @@ class WebBinanceAPI {
 
         } catch (error) {
             console.error('خطأ في الحصول على البيانات:', error.message);
-            
-            // Fallback to mock data for development
-            console.log('استخدام بيانات وهمية للتطوير...');
-            return this.getMockKlineData(symbol, limit);
         }
     }
 
@@ -60,78 +56,8 @@ class WebBinanceAPI {
 
         } catch (error) {
             console.error('خطأ في الحصول على السعر:', error.message);
-            
-            // Return mock price
-            const mockPrices = {
-                'BTCUSDT': 43250.75,
-                'ETHUSDT': 2680.50,
-                'ADAUSDT': 0.4825,
-                'BNBUSDT': 310.25,
-                'XRPUSDT': 0.5875,
-                'SOLUSDT': 98.45,
-                'DOTUSDT': 7.32,
-                'LINKUSDT': 15.87
-            };
-            
-            return mockPrices[symbol.toUpperCase()] || 100.0;
         }
     }
-
-    // Generate mock candlestick data for development
-    getMockKlineData(symbol, limit) {
-        const data = [];
-        let basePrice = 45000; // Base price for BTC
-        
-        // Adjust base price for different symbols
-        const priceMultipliers = {
-            'BTCUSDT': 45000,
-            'ETHUSDT': 2650,
-            'ADAUSDT': 0.48,
-            'BNBUSDT': 310,
-            'XRPUSDT': 0.58,
-            'SOLUSDT': 95,
-            'DOTUSDT': 7.3,
-            'LINKUSDT': 15.8
-        };
-        
-        basePrice = priceMultipliers[symbol.toUpperCase()] || 100;
-        
-        const now = Date.now();
-        const intervalMs = 60 * 60 * 1000; // 1 hour in milliseconds
-        
-        for (let i = limit - 1; i >= 0; i--) {
-            const openTime = now - (i * intervalMs);
-            const closeTime = openTime + intervalMs - 1;
-            
-            // Generate realistic price movement
-            const priceChange = (Math.random() - 0.5) * basePrice * 0.02; // 2% max change
-            const open = basePrice + priceChange;
-            const variation = basePrice * 0.01; // 1% variation
-            
-            const high = open + Math.random() * variation;
-            const low = open - Math.random() * variation;
-            const close = low + Math.random() * (high - low);
-            const volume = Math.random() * 1000 + 100;
-            
-            basePrice = close; // Update base price for next candle
-            
-            // Binance kline format: [timestamp, open, high, low, close, volume, close_time, quote_volume, count, taker_buy_volume, taker_buy_quote_volume, ignore]
-            data.push([
-                openTime,
-                open.toFixed(8),
-                high.toFixed(8),
-                low.toFixed(8),
-                close.toFixed(8),
-                volume.toFixed(8),
-                closeTime,
-                (volume * close).toFixed(8),
-                Math.floor(Math.random() * 100),
-                (volume * 0.6).toFixed(8),
-                (volume * close * 0.6).toFixed(8),
-                "0"
-            ]);
-        }
-        
         return data;
     }
 
