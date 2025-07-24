@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>تحليل موجات إليوت - Binance</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<h1>تحليل موجات إليوت - Binance</h1>
+<div id="controls">
+  <button onclick="loadData('1h')">بيانات ساعة</button>
+  <button onclick="loadData('4h')">بيانات 4 ساعات</button>
+  <button onclick="loadData('1d')">بيانات يوم</button>
+</div>
+<div id="results">
+  <h2>النتائج</h2>
+  <pre id="output">انتظر تحميل البيانات...</pre>
+</div>
+
+<script src="ElliottWaveAnalyzer.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
