@@ -589,16 +589,29 @@
                 const priceChange = Math.abs(endPrice - startPrice) / startPrice;
                 const baseConfidence = Math.min(90, 60 + (priceChange * 1000));
                 
-                    	const waveTarget = direction === 'صاعد' ? endPrice * 1.05 : endPrice * 0.95;
-                    	patterns.push({
-                    		type: patternTypes[Math.floor(Math.random() * patternTypes.length)],
-                    		direction: direction,
-                    		confidence: baseConfidence + (Math.random() * 20 - 10),
-                    		startIndex: startIdx,
-                    		endIndex: Math.min(endIdx, prices.length - 1),
-                    		waveLength: (Math.abs(endPrice - startPrice) / startPrice) * 100,
-                    		target: waveTarget.toFixed(2)
-                    });
+                // حساب الهدف بطريقة واقعية أكثر
+                const currentPrice = prices[prices.length - 1]; // السعر الحالي
+                let waveTarget;
+                
+                if (direction === 'صاعد') {
+                    // للاتجاه الصاعد: هدف بين 1% إلى 5%
+                    const targetPercentage = 0.01 + (Math.random() * 0.04); // 1% إلى 5%
+                    waveTarget = currentPrice * (1 + targetPercentage);
+                } else {
+                    // للاتجاه الهابط: هدف بين -1% إلى -8%
+                    const targetPercentage = 0.01 + (Math.random() * 0.07); // 1% إلى 8%
+                    waveTarget = currentPrice * (1 - targetPercentage);
+                }
+                
+                patterns.push({
+                    type: patternTypes[Math.floor(Math.random() * patternTypes.length)],
+                    direction: direction,
+                    confidence: baseConfidence + (Math.random() * 20 - 10),
+                    startIndex: startIdx,
+                    endIndex: Math.min(endIdx, prices.length - 1),
+                    waveLength: (Math.abs(endPrice - startPrice) / startPrice) * 100,
+                    target: waveTarget.toFixed(2)
+                });
             }
             
             return patterns;
