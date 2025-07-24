@@ -1,8 +1,8 @@
 async function loadData(interval) {
   document.getElementById('output').textContent = 'جارٍ تحميل البيانات...';
 
-  const symbol = 'BTCUSDT'; // يمكنك تغييره لأي زوج تفضله
-  const limit = 100; // عدد الشموع
+  const symbol = 'BTCUSDT'; // يمكنك تغييره
+  const limit = 100;
   const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
 
   try {
@@ -19,11 +19,10 @@ async function loadData(interval) {
     ]);
 
     const analyzer = new ElliottWaveAnalyzer();
-    const result = analyzer.analyze(formattedData);
-    analyzer.printAnalysis(result);
+    const result = analyzer.analyze(formattedData, symbol);
+    const outputText = analyzer.printAnalysis(result);
 
-    // عرض النتائج
-    document.getElementById('output').textContent = result.summary || 'تم التحليل بنجاح.';
+    document.getElementById('output').textContent = outputText;
   } catch (err) {
     document.getElementById('output').textContent = 'خطأ في تحميل البيانات: ' + err.message;
   }
