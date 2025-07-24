@@ -17,12 +17,7 @@ class WebBinanceAPI {
 
             console.log(`جاري الحصول على بيانات ${symbol} - الفترة: ${interval} - العدد: ${limit}`);
 
-            const response = await fetch(`${url}?${params}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
+            const response = await fetch(`${url}?${params}`);
 
             if (response.ok) {
                 const data = await response.json();
@@ -34,7 +29,22 @@ class WebBinanceAPI {
 
         } catch (error) {
             console.error('خطأ في الحصول على البيانات:', error.message);
-            throw error;
+            
+            // Try alternative approach with JSONP-like fallback
+            // محاولة استخدام CORS proxy
+            console.log('محاولة بديلة باستخدام CORS proxy...');
+            try {
+                const proxyResponse = await fetch(`https://cors-anywhere.herokuapp.com/${this.baseURL}/api/v3/klines?${params}`);
+                if (proxyResponse.ok) {
+                    const data = await proxyResponse.json();
+                    console.log(`تم الحصول على ${data.length} شمعة عبر proxy`);
+                    return data;
+                }
+            } catch (proxyError) {
+                console.error('فشل CORS proxy:', proxyError.message);
+            }
+            
+            throw new Error('لا يمكن الوصول إلى Binance API. جرب:\n1. تشغيل الملف من web server محلي\n2. استخدام برنامج سطح المكتب');
         }
     }
 
@@ -57,7 +67,7 @@ class WebBinanceAPI {
 
         } catch (error) {
             console.error('خطأ في الحصول على السعر:', error.message);
-            throw error;
+            throw new Error('لا يمكن الحصول على السعر بسبب قيود CORS. يرجى تشغيل الملف من web server.');
         }
     }
 
