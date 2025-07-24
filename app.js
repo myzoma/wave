@@ -3,7 +3,7 @@ async function loadData(interval) {
 
   const symbol = 'BTCUSDT'; // يمكنك تغييره إلى أي زوج تريده
   const limit = 100; // عدد الشموع
-  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+  const url = `https://api1.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
 
   try {
     const response = await fetch(url);
