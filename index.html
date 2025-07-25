@@ -489,8 +489,8 @@
                                     <p><strong>📍 نقطة البداية:</strong> الشمعة رقم ${pattern.startIndex} (من ${pattern.totalCandles} شمعة)</p>
                                     <p><strong>🏁 نقطة النهاية:</strong> الشمعة رقم ${pattern.endIndex} (من ${pattern.totalCandles} شمعة)</p>
                                     <p><strong>📏 المدة الزمنية:</strong> ${pattern.endIndex - pattern.startIndex} شمعة</p>
-                                    <p><strong>📊 طول الموجة:</strong> ${pattern.waveLength.toFixed(2)}%</p>
-                                    <p><strong>🎯 الهدف المتوقع:</strong> $${pattern.target}</p>
+<p><strong>📏 طول الموجة:</strong> ${(parseFloat(pattern.waveLength) || 0).toFixed(2)}%</p>
+<p><strong>🎯 الهدف المتوقع:</strong> $${(parseFloat(pattern.target) || 0).toFixed(4)}</p>
                                 </div>
                             </div>
                         `).join('')}
