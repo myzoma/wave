@@ -5,7 +5,7 @@ class BinanceAPI {
     constructor(apiKey, apiSecret) {
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
-        this.baseURL = 'https://api.binance.com';
+        this.baseURL = 'https://api1.binance.com';
     }
 
     // إنشاء التوقيع للطلبات المحمية
