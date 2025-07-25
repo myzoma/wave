@@ -1,8 +1,9 @@
 // Web-compatible API for Binance integration
 class WebBinanceAPI {
     constructor() {
-        this.baseURL = 'https://api.binance.com';
-        this.proxyURL = 'https://cors-anywhere.herokuapp.com/'; // CORS proxy for development
+       this.proxyURL = 'https://corsproxy.io/?';
+const url = `${this.proxyURL}https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT`;
+
     }
 
     // Get candlestick data
