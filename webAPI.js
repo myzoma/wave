@@ -1,7 +1,7 @@
 // Web-compatible API for Binance integration
 class WebBinanceAPI {
     constructor() {
-        this.baseURL = 'https://api1.binance.com';
+        this.baseURL = 'https://api.binance.com';
         this.proxyURL = 'https://cors-anywhere.herokuapp.com/'; // CORS proxy for development
     }
 
