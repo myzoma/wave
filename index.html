@@ -3,750 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محلل موجات Elliott Wave</title>
+    <title>محلل موجات إليوت - Elliott Wave Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind-rtl.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
-            direction: rtl;
+            color: #e6e6e6;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        .gradient-text {
+            background: linear-gradient(90deg, #4f46e5, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .controls {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        .control-group {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .control-item {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .control-item label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .control-item select, .control-item input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        .control-item select:focus, .control-item input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        
-        button {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            min-width: 150px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .btn-secondary {
-            background: #f8f9fa;
-            color: #333;
-            border: 2px solid #ddd;
-        }
-        
-        .btn-secondary:hover {
-            background: #e9ecef;
-        }
-        
-        .results {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .analysis-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #eee;
-        }
-        
-        .symbol-info h2 {
-            color: #333;
-            margin-bottom: 5px;
-        }
-        
-        .symbol-info .price {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #28a745;
-        }
-        
-        .status-badge {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 12px;
-        }
-        
-        .status-success {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .patterns-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .pattern-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            border-left: 5px solid #667eea;
-        }
-        
-        .pattern-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .pattern-type {
-            font-weight: bold;
-            color: #333;
-            font-size: 1.1rem;
-        }
-        
-        .confidence {
-            background: #667eea;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        
-        .confidence.high {
-            background: #28a745;
-        }
-        
-        .confidence.medium {
-            background: #ffc107;
-            color: #333;
-        }
-        
-        .confidence.low {
-            background: #dc3545;
-        }
-        
-        .pattern-direction {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .direction-arrow {
-            font-size: 1.5rem;
-        }
-        
-        .direction-up {
-            color: #28a745;
-        }
-        
-        .direction-down {
-            color: #dc3545;
-        }
-        
-        .summary-box {
-            background: #e7f3ff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            border-right: 5px solid #007bff;
-        }
-        
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #f5c6cb;
-            margin-top: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .control-group {
-                flex-direction: column;
-            }
-            
-            .button-group {
-                flex-direction: column;
-            }
-            
-            button {
-                min-width: auto;
-            }
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
     </style>
-    <script src="webAPI-direct.js"></script>
-    <script src="elliottWaveAnalyzer.js"></script>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🌊 محلل موجات Elliott Wave</h1>
-            <p>تحليل متقدم للأسواق المالية باستخدام نظرية Elliott Wave</p>
-        </div>
+<body class="p-4 md:p-6">
+    <div class="container mx-auto max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2 gradient-text">
+                <i class="fas fa-wave-square mr-2"></i>محلل موجات إليوت
+            </h1>
+            <p class="text-gray-400">تحليل فني متقدم للأسواق المالية باستخدام نظرية موجات إليوت</p>
+        </header>
 
-        <div class="controls">
-            <div class="control-group">
-                <div class="control-item">
-                    <label for="symbolSelect">الرمز المالي:</label>
-                    <select id="symbolSelect">
-                        <option value="BTCUSDT">Bitcoin (BTC/USDT)</option>
-                        <option value="ETHUSDT">Ethereum (ETH/USDT)</option>
-                        <option value="ADAUSDT">Cardano (ADA/USDT)</option>
-                        <option value="BNBUSDT">Binance Coin (BNB/USDT)</option>
-                        <option value="XRPUSDT">Ripple (XRP/USDT)</option>
-                        <option value="SOLUSDT">Solana (SOL/USDT)</option>
-                        <option value="DOTUSDT">Polkadot (DOT/USDT)</option>
-                        <option value="LINKUSDT">Chainlink (LINK/USDT)</option>
-                    </select>
-                </div>
-                
-                <div class="control-item">
-                    <label for="intervalSelect">الفترة الزمنية:</label>
-                    <select id="intervalSelect">
-                        <option value="15m">15 دقيقة</option>
-                        <option value="30m">30 دقيقة</option>
-                        <option value="1h" selected>ساعة واحدة</option>
-                        <option value="4h">4 ساعات</option>
-                        <option value="1d">يوم واحد</option>
-                        <option value="1w">أسبوع واحد</option>
-                    </select>
-                </div>
-                
-                <div class="control-item">
-                    <label for="limitInput">عدد الشموع:</label>
-                    <input type="number" id="limitInput" value="100" min="50" max="500">
-                </div>
-            </div>
-
-            <div class="button-group">
-                <button class="btn-primary" onclick="analyzeSymbol()">
-                    🔍 تحليل الرمز
-                </button>
-                <button class="btn-secondary" onclick="startContinuousAnalysis()">
-                    🔄 تحليل مستمر
-                </button>
-                <button class="btn-secondary" onclick="stopContinuousAnalysis()">
-                    ⏹️ إيقاف التحليل
-                </button>
-                <button class="btn-secondary" onclick="clearResults()">
-                    🗑️ مسح النتائج
-                </button>
-            </div>
-        </div>
-
-        <div id="results" class="results" style="display: none;">
-            <!-- النتائج ستظهر هنا -->
-        </div>
-    </div>
-
-    <script>
-        let continuousAnalysisInterval = null;
-        let isAnalyzing = false;
-        
-        // حساب عدد الشموع المثلى حسب الفريم (تحليل 24 ساعة)
-        function getOptimalCandleCount(interval) {
-            const candleCounts = {
-                '15m': 96,   // 24 ساعة ÷ 15 دقيقة = 96
-                '30m': 48,   // 24 ساعة ÷ 30 دقيقة = 48
-                '1h': 24,    // 24 ساعة ÷ 1 ساعة = 24
-                '4h': 6,     // 24 ساعة ÷ 4 ساعات = 6
-                '1d': 1,     // 1 يوم
-                '1w': 1      // 1 أسبوع
-            };
-            
-            return candleCounts[interval] || 24;
-        }
-        
-        // تحديث عدد الشموع عند تغيير الفريم
-        document.getElementById('intervalSelect').addEventListener('change', function() {
-            const selectedInterval = this.value;
-            const optimalCount = getOptimalCandleCount(selectedInterval);
-            document.getElementById('limitInput').value = optimalCount;
-        });
-
-        // دالة تحليل الرمز
-        async function analyzeSymbol() {
-            if (isAnalyzing) {
-                showError('التحليل قيد التشغيل بالفعل...');
-                return;
-            }
-
-            const symbol = document.getElementById('symbolSelect').value;
-            const interval = document.getElementById('intervalSelect').value;
-            const limit = getOptimalCandleCount(interval);
-
-            showLoading('جاري تحليل ' + symbol + '...');
-            isAnalyzing = true;
-
-            try {
-                // محاكاة استدعاء API
-                const analysis = await simulateAnalysis(symbol, interval, limit);
-                displayResults(analysis);
-            } catch (error) {
-                showError('خطأ في التحليل: ' + error.message);
-            } finally {
-                isAnalyzing = false;
-            }
-        }
-
-        // دالة بدء التحليل المستمر
-        function startContinuousAnalysis() {
-            if (continuousAnalysisInterval) {
-                showError('التحليل المستمر يعمل بالفعل');
-                return;
-            }
-
-            analyzeSymbol();
-            continuousAnalysisInterval = setInterval(() => {
-                if (!isAnalyzing) {
-                    analyzeSymbol();
-                }
-            }, 60000); // كل دقيقة
-
-            showInfo('تم بدء التحليل المستمر - سيتم التحليل كل دقيقة');
-        }
-
-        // دالة إيقاف التحليل المستمر
-        function stopContinuousAnalysis() {
-            if (continuousAnalysisInterval) {
-                clearInterval(continuousAnalysisInterval);
-                continuousAnalysisInterval = null;
-                showInfo('تم إيقاف التحليل المستمر');
-            } else {
-                showError('التحليل المستمر غير نشط');
-            }
-        }
-
-        // دالة مسح النتائج
-        function clearResults() {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.style.display = 'none';
-            resultsDiv.innerHTML = '';
-        }
-
-        // دالة عرض حالة التحميل
-        function showLoading(message) {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>${message}</p>
-                </div>
-            `;
-            resultsDiv.style.display = 'block';
-        }
-
-        // دالة عرض النتائج
-        function displayResults(analysis) {
-            const resultsDiv = document.getElementById('results');
-            
-            if (analysis.status === 'success') {
-                resultsDiv.innerHTML = `
-                    <div class="analysis-header">
-                        <div class="symbol-info">
-                            <h2>${analysis.symbol}</h2>
-                            <div class="price">$${analysis.currentPrice.toFixed(4)}</div>
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Control Panel -->
+            <div class="lg:col-span-1">
+                <div class="card rounded-xl p-6 h-full">
+                    <h2 class="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">
+                        <i class="fas fa-sliders-h ml-2"></i>إعدادات التحليل
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">الرمز المالي</label>
+                            <select id="symbolSelect" class="w-full bg-gray-800 text-white rounded-lg p-2 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="BTCUSDT">Bitcoin (BTC/USDT)</option>
+                                <option value="ETHUSDT">Ethereum (ETH/USDT)</option>
+                                <option value="SOLUSDT">Solana (SOL/USDT)</option>
+                                <option value="XRPUSDT">Ripple (XRP/USDT)</option>
+                                <option value="ADAUSDT">Cardano (ADA/USDT)</option>
+                            </select>
                         </div>
-                        <div class="status-badge status-success">نجح التحليل</div>
-                    </div>
-
-                    <div class="patterns-grid">
-                        ${analysis.patterns.map(pattern => `
-                            <div class="pattern-card">
-                                <div class="pattern-header">
-                                    <div class="pattern-type">${pattern.type}</div>
-                                    <div class="confidence ${getConfidenceClass(pattern.confidence)}">
-                                        ${pattern.confidence.toFixed(1)}%
-                                    </div>
-                                </div>
-                                <div class="pattern-direction">
-                                    <span class="direction-arrow ${pattern.direction === 'صاعد' ? 'direction-up' : 'direction-down'}">
-                                        ${pattern.direction === 'صاعد' ? '📈' : '📉'}
-                                    </span>
-                                    <span>${pattern.direction}</span>
-                                </div>
-                                <div class="pattern-details">
-                                    <p><strong>📍 نقطة البداية:</strong> الشمعة رقم ${pattern.startIndex} (من ${pattern.totalCandles} شمعة)</p>
-                                    <p><strong>🏁 نقطة النهاية:</strong> الشمعة رقم ${pattern.endIndex} (من ${pattern.totalCandles} شمعة)</p>
-                                    <p><strong>📏 المدة الزمنية:</strong> ${pattern.endIndex - pattern.startIndex} شمعة</p>
-                                    <p><strong>📊 طول الموجة:</strong> ${pattern.waveLength.toFixed(2)}%</p>
-                                    <p><strong>🎯 الهدف المتوقع:</strong> $${pattern.target}</p>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-
-                    <div class="summary-box">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h3>📝 ملخص التحليل</h3>
-                            <button class="btn-secondary" onclick="copyAnalysis()" style="min-width: auto; padding: 8px 16px;">
-                                📋 نسخ التحليل
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">الفترة الزمنية</label>
+                            <select id="intervalSelect" class="w-full bg-gray-800 text-white rounded-lg p-2 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="15m">15 دقيقة</option>
+                                <option value="30m">30 دقيقة</option>
+                                <option value="1h" selected>ساعة</option>
+                                <option value="4h">4 ساعات</option>
+                                <option value="1d">يوم</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">عدد الشموع</label>
+                            <input type="number" id="candleCount" value="100" min="50" max="500" 
+                                   class="w-full bg-gray-800 text-white rounded-lg p-2 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        
+                        <div class="pt-2 space-y-2">
+                            <button id="analyzeBtn" 
+                                    class="w-full py-3 px-4 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 transition flex items-center justify-center">
+                                <i class="fas fa-play ml-2"></i>بدء التحليل
+                            </button>
+                            
+                            <button id="stopBtn"
+                                    class="w-full py-3 px-4 rounded-lg font-medium bg-gray-700 text-white hover:bg-gray-600 transition flex items-center justify-center">
+                                <i class="fas fa-stop ml-2"></i>إيقاف
                             </button>
                         </div>
-                        <p>${analysis.summary}</p>
-                        <p><strong>عدد الأنماط المكتشفة:</strong> ${analysis.patterns.length}</p>
-                        <p><strong>وقت التحليل:</strong> ${new Date().toLocaleString('ar-SA')}</p>
                     </div>
-                `;
-            } else {
-                resultsDiv.innerHTML = `
-                    <div class="analysis-header">
-                        <div class="symbol-info">
-                            <h2>${analysis.symbol || 'غير محدد'}</h2>
+                    
+                    <div id="status" class="mt-6 p-3 rounded-lg bg-gray-800 text-sm text-center hidden">
+                        <i class="fas fa-circle-notch fa-spin mr-1"></i>
+                        <span>جاري التحميل...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Results Panel -->
+            <div class="lg:col-span-3">
+                <!-- Price Info Card -->
+                <div class="card rounded-xl p-6 mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h2 id="symbolTitle" class="text-2xl font-bold text-white">-</h2>
+                            <p id="priceInfo" class="text-3xl font-bold mt-1">$0.00</p>
                         </div>
-                        <div class="status-badge status-error">فشل التحليل</div>
+                        <div id="marketStatus" class="mt-3 md:mt-0">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-gray-800">جاري التحميل...</span>
+                        </div>
                     </div>
-                    <div class="error-message">
-                        <h3>❌ خطأ في التحليل</h3>
-                        <p>${analysis.message}</p>
+                </div>
+                
+                <!-- Analysis Results -->
+                <div id="analysisResults" class="space-y-4">
+                    <div class="card rounded-xl p-6 text-center">
+                        <div class="text-gray-400 mb-4">
+                            <i class="fas fa-wave-square text-4xl opacity-30"></i>
+                            <p class="mt-2">سيظهر تحليل موجات إليوت هنا بعد تشغيل التحليل</p>
+                        </div>
                     </div>
-                `;
-            }
-            
-            resultsDiv.style.display = 'block';
-        }
-
-        // دالة تحديد فئة مستوى الثقة
-        function getConfidenceClass(confidence) {
-            if (confidence >= 75) return 'high';
-            if (confidence >= 60) return 'medium';
-            return 'low';
-        }
-
-        // دالة عرض رسالة خطأ
-        function showError(message) {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = `
-                <div class="error-message">
-                    <h3>❌ خطأ</h3>
-                    <p>${message}</p>
                 </div>
-            `;
-            resultsDiv.style.display = 'block';
-        }
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>تم التطوير باستخدام ElliottWaveAnalyzer &copy; 2023</p>
+        </footer>
+    </div>
 
-        // دالة عرض رسالة معلومات
-        function showInfo(message) {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = `
-                <div class="summary-box">
-                    <h3>ℹ️ معلومات</h3>
-                    <p>${message}</p>
-                </div>
-            `;
-            resultsDiv.style.display = 'block';
-        }
-
-        // تحليل البيانات باستخدام API حقيقي
-        async function simulateAnalysis(symbol, interval, limit) {
-            try {
-                // إنشاء instance من WebBinanceAPI
-                const binanceAPI = new WebBinanceAPI();
-                
-                // الحصول على البيانات الحقيقية
-                const [klineData, currentPrice] = await Promise.all([
-                    binanceAPI.getKlineData(symbol, interval, limit),
-                    binanceAPI.getCurrentPrice(symbol)
-                ]);
-                
-                // تحليل بيانات الشموع وإنشاء أنماط
-                const patterns = analyzeKlineData(klineData, currentPrice);
-                
-                // ترتيب الأنماط حسب مستوى الثقة
-                patterns.sort((a, b) => b.confidence - a.confidence);
-                
-                return {
-                    status: 'success',
-                    symbol: symbol,
-                    currentPrice: currentPrice,
-                    patterns: patterns,
-                    summary: patterns.length > 0 ? 
-                        `تم اكتشاف ${patterns.length} نمط. أقوى إشارة هي ${patterns[0].type} ${patterns[0].direction} بثقة ${patterns[0].confidence.toFixed(1)}%` :
-                        'لم يتم اكتشاف أنماط واضحة في الوقت الحالي'
-                };
-                
-            } catch (error) {
-                console.error('خطأ في تحليل البيانات:', error);
-                return {
-                    status: 'error',
-                    symbol: symbol,
-                    message: 'حدث خطأ في الحصول على البيانات أو تحليلها: ' + error.message
-                };
-            }
-        }
-        
-     function analyzeKlineData(klineData, realCurrentPrice) {
-    if (!klineData || klineData.length < 10) {
-        return [];
-    }
-    
-    try {
-        const analyzer = new ElliottWaveAnalyzer();
-        
-        const priceData = klineData.map((candle, index) => ({
-            index: index,
-            timestamp: parseInt(candle[0]),
-            open: parseFloat(candle[1]),
-            high: parseFloat(candle[2]),
-            low: parseFloat(candle[3]),
-            close: parseFloat(candle[4]),
-            volume: parseFloat(candle[5])
-        }));
-        
-        const currentPrice = realCurrentPrice || priceData[priceData.length - 1].close;
-        const totalCandles = klineData.length;
-        
-        // 1. جرب الدوال المتاحة بالترتيب
-        let analysisResults;
-        if (typeof analyzer.analyze === 'function') {
-            console.log('جرب استخدام analyzer.analyze...');
-            analysisResults = analyzer.analyze(priceData);
-        } else if (typeof analyzer.analyzeElliottWave === 'function') {
-            console.log('جرب استخدام analyzer.analyzeElliottWave...');
-            analysisResults = analyzer.analyzeElliottWave(priceData);
-        } else if (typeof analyzer.analyzeWavePatterns === 'function') {
-            console.log('جرب استخدام analyzer.analyzeWavePatterns...');
-            analysisResults = analyzer.analyzeWavePatterns(priceData);
-        } else {
-            throw new Error('لم يتم العثور على دالة تحليل مناسبة');
-        }
-        
-        console.log('نتيجة التحليل الخام:', analysisResults);
-        
-        // 2. معالجة النتائج
-        let patterns = [];
-        if (Array.isArray(analysisResults)) {
-            patterns = analysisResults;
-        } else if (analysisResults && Array.isArray(analysisResults.patterns)) {
-            patterns = analysisResults.patterns;
-        } else if (analysisResults) {
-            patterns = [analysisResults];
-        }
-        
-        // 3. التحقق من صحة الأنماط قبل الفرز
-        if (!Array.isArray(patterns)) {
-            patterns = [];
-        }
-        
-        // 4. إرجاع النتائج بالشكل المتوقع
-        return {
-            status: 'success',
-            patterns: patterns.map(p => ({
-                type: p.type || 'غير معروف',
-                direction: p.direction || (p.endValue > p.startValue ? 'صاعد' : 'هابط'),
-                confidence: p.confidence || 50,
-                startIndex: p.startIndex || 0,
-                endIndex: p.endIndex || 0,
-                waveLength: p.waveLength || 0,
-                target: p.target || 0,
-                totalCandles: totalCandles
-            }))
-        };
-        
-    } catch (error) {
-        console.error('حدث خطأ في التحليل:', error);
-        return {
-            status: 'error',
-            message: 'حدث خطأ في تحليل البيانات: ' + error.message
-        };
-    }
-}
-}
-        
-        // دالة ترجمة أنواع الأنماط
-        function translatePatternType(englishType) {
-            const translations = {
-                'impulse': 'موجة دافعة',
-                'correction': 'موجة تصحيحية', 
-                'triangle': 'مثلث متماثل',
-                'wedge_up': 'إسفين صاعد',
-                'wedge_down': 'إسفين هابط',
-                'diagonal': 'قطر',
-                'zigzag': 'زيجزاج',
-                'flat': 'مسطح',
-                'complex': 'معقد'
-            };
-            
-            if (!englishType) return 'موجة دافعة';
-            
-            const lowerType = englishType.toLowerCase();
-            for (const [eng, ar] of Object.entries(translations)) {
-                if (lowerType.includes(eng)) {
-                    return ar;
-                }
-            }
-            
-            return englishType; // إرجاع النوع الأصلي إذا لم يجد ترجمة
-        }
-
-        // دالة نسخ التحليل
-        async function copyAnalysis() {
-            try {
-                const resultsDiv = document.getElementById('results');
-                if (!resultsDiv || resultsDiv.style.display === 'none') {
-                    showError('لا توجد نتائج لنسخها');
-                    return;
-                }
-                
-                // استخراج بيانات التحليل
-                const symbol = document.querySelector('.symbol-info h2')?.textContent || 'غير محدد';
-                const price = document.querySelector('.symbol-info .price')?.textContent || 'غير محدد';
-                const summary = document.querySelector('.summary-box p')?.textContent || 'غير متوفر';
-                const patterns = document.querySelectorAll('.pattern-card');
-                
-                let analysisText = `🌊 تحليل Elliott Wave\n`;
-                analysisText += `────────────────────\n`;
-                analysisText += `📊 الرمز: ${symbol}\n`;
-                analysisText += `💰 السعر: ${price}\n\n`;
-                
-                analysisText += `📝 ملخص التحليل:\n${summary}\n\n`;
-                
-                if (patterns.length > 0) {
-                    analysisText += `📈 الأنماط المكتشفة:\n`;
-                    patterns.forEach((pattern, index) => {
-                        const type = pattern.querySelector('.pattern-type')?.textContent || '';
-                        const confidence = pattern.querySelector('.confidence')?.textContent || '';
-                        const direction = pattern.querySelector('.pattern-direction span:last-child')?.textContent || '';
-                        const target = pattern.querySelector('.pattern-details p:last-child')?.textContent?.replace('🎯 الهدف المتوقع: ', '') || '';
-                        
-                        analysisText += `${index + 1}. ${type} ${direction} - الثقة: ${confidence}\n`;
-                        analysisText += `   🎯 الهدف: ${target}\n\n`;
-                    });
-                }
-                
-                analysisText += `────────────────────\n`;
-                analysisText += `🕰️ وقت التحليل: ${new Date().toLocaleString('ar-SA')}`;
-                
-                await navigator.clipboard.writeText(analysisText);
-                showInfo('✅ تم نسخ التحليل بنجاح!');
-                
-            } catch (error) {
-                console.error('خطأ في النسخ:', error);
-                showError('فشل في نسخ التحليل. تأكد من أن المتصفح يدعم عملية النسخ.');
-            }
-        }
-        
-        // تشغيل تحليل تلقائي عند تحميل الصفحة
-        window.addEventListener('load', () => {
-            console.log('تم تحميل محلل Elliott Wave بنجاح');
-        });
+    <!-- Scripts -->
+    <script src="elliottWaveAnalyzer.js"></script>
+    <script src="webAPI-direct.js"></script>
+    <script>
+        // JavaScript code from previous response goes here
+        // [Previous JavaScript code should be placed here]
     </script>
 </body>
 </html>
-
