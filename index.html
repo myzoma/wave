@@ -591,125 +591,73 @@
             }
         }
         
-        // دالة تحليل بيانات الشموع باستخدام المحلل الأصلي Elliott Wave
-        function analyzeKlineData(klineData, realCurrentPrice) {
-            if (!klineData || klineData.length < 10) {
-                return [];
-            }
-            
-            try {
-                // إنشاء instance من المحلل الأصلي
-                const analyzer = new ElliottWaveAnalyzer();
-                
-                // تحويل بيانات الشموع للصيغة المطلوبة
-                const priceData = klineData.map((candle, index) => ({
-                    index: index,
-                    timestamp: parseInt(candle[0]),
-                    open: parseFloat(candle[1]),
-                    high: parseFloat(candle[2]),
-                    low: parseFloat(candle[3]),
-                    close: parseFloat(candle[4]),
-                    volume: parseFloat(candle[5])
-                }));
-                
-                const currentPrice = realCurrentPrice || priceData[priceData.length - 1].close;
-                const totalCandles = klineData.length;
-                
-                // تشغيل التحليل الأصلي
-                const analysisResults = analyzer.analyzeMarketData(priceData);
-                
-                // تحويل النتائج للصيغة المطلوبة في الواجهة
-                const patterns = [];
-                
-                if (analysisResults && analysisResults.patterns) {
-                    analysisResults.patterns.forEach(pattern => {
-                        // تحديد الاتجاه بناءً على نوع الموجة
-                        let direction = 'صاعد';
-                        if (pattern.type && (pattern.type.includes('correction') || 
-                            pattern.type.includes('تصحيح') || 
-                            pattern.points && pattern.points.length >= 2 &&
-                            pattern.points[pattern.points.length - 1].price < pattern.points[0].price)) {
-                            direction = 'هابط';
-                        }
-                        
-                        // حساب الهدف المتوقع
-                        let target = currentPrice;
-                        if (pattern.projections && pattern.projections.length > 0) {
-                            target = pattern.projections[0].price;
-                        } else {
-                            // حساب تقريبي للهدف
-                            const waveLength = pattern.waveLength || 0.05;
-                            target = direction === 'صاعد' ? 
-                                (currentPrice * (1 + waveLength)).toFixed(4) :
-                                (currentPrice * (1 - waveLength)).toFixed(4);
-                        }
-                        
-                        patterns.push({
-                            type: translatePatternType(pattern.type) || 'موجة دافعة',
-                            direction: direction,
-                            confidence: pattern.confidence || 70,
-                            startIndex: pattern.startIndex || 1,
-                            endIndex: pattern.endIndex || totalCandles - 1,
-                            waveLength: (pattern.waveLength || 0.05) * 100,
-                            target: target.toString(),
-                            totalCandles: totalCandles
-                        });
-                    });
-                }
-                
-                // إذا لم يجد المحلل أنماط، أنشئ نمط اتجاه عام
-                if (patterns.length === 0) {
-                    const prices = priceData.map(d => d.close);
-                    const firstPrice = prices[0];
-                    const lastPrice = prices[prices.length - 1];
-                    const trendDirection = lastPrice > firstPrice ? 'صاعد' : 'هابط';
-                    const trendStrength = Math.abs(lastPrice - firstPrice) / firstPrice;
-                    
-                    patterns.push({
-                        type: trendDirection === 'صاعد' ? 'موجة دافعة' : 'موجة تصحيحية',
-                        direction: trendDirection,
-                        confidence: Math.min(85, 60 + (trendStrength * 300)),
-                        startIndex: 1,
-                        endIndex: totalCandles - 1,
-                        waveLength: trendStrength * 100,
-                        target: trendDirection === 'صاعد' ? 
-                            (currentPrice * (1 + trendStrength * 0.5)).toFixed(4) :
-                            (currentPrice * (1 - trendStrength * 0.5)).toFixed(4),
-                        totalCandles: totalCandles
-                    });
-                }
-                
-                // ترتيب الأنماط حسب مستوى الثقة
-                return patterns
-                    .sort((a, b) => b.confidence - a.confidence)
-                    .slice(0, 3); // أقوى 3 أنماط
-                    
-            } catch (error) {
-                console.error('خطأ في المحلل الأصلي:', error);
-                
-                // fallback للتحليل المبسط في حالة الخطأ
-                const prices = klineData.map(candle => parseFloat(candle[4]));
-                const currentPrice = realCurrentPrice || prices[prices.length - 1];
-                const totalCandles = klineData.length;
-                const firstPrice = prices[0];
-                const lastPrice = prices[prices.length - 1];
-                const trendDirection = lastPrice > firstPrice ? 'صاعد' : 'هابط';
-                const trendStrength = Math.abs(lastPrice - firstPrice) / firstPrice;
-                
-                return [{
-                    type: trendDirection === 'صاعد' ? 'موجة دافعة' : 'موجة تصحيحية',
-                    direction: trendDirection,
-                    confidence: Math.min(85, 60 + (trendStrength * 300)),
-                    startIndex: 1,
-                    endIndex: totalCandles - 1,
-                    waveLength: trendStrength * 100,
-                    target: trendDirection === 'صاعد' ? 
-                        (currentPrice * (1 + trendStrength * 0.5)).toFixed(4) :
-                        (currentPrice * (1 - trendStrength * 0.5)).toFixed(4),
-                    totalCandles: totalCandles
-                }];
-            }
+      async function analyzeKlineData(klineData, realCurrentPrice) {
+    console.log('بدء تحليل البيانات...');
+    const analyzer = new ElliottWaveAnalyzer();
+    
+    // تحويل البيانات للصيغة المطلوبة
+    const priceData = klineData.map((candle, index) => ({
+        time: candle[0],
+        open: parseFloat(candle[1]),
+        high: parseFloat(candle[2]),
+        low: parseFloat(candle[3]),
+        close: parseFloat(candle[4]),
+        volume: parseFloat(candle[5])
+    }));
+    
+    try {
+        // المحاولة مع الدالة analyze أولاً
+        try {
+            console.log('جاري التحليل باستخدام analyzer.analyze...');
+            const result = await analyzer.analyze(priceData);
+            console.log('نتيجة analyze:', result);
+            return formatAnalysisResult(result, realCurrentPrice);
+        } catch (e) {
+            console.warn('فشل analyze، جرب analyzeElliottWave...', e);
         }
+        
+        // إذا فشلت، جرب analyzeElliottWave
+        try {
+            console.log('جاري التحليل باستخدام analyzer.analyzeElliottWave...');
+            const result = await analyzer.analyzeElliottWave(priceData);
+            console.log('نتيجة analyzeElliottWave:', result);
+            return formatAnalysisResult(result, realCurrentPrice);
+        } catch (e) {
+            console.error('فشل analyzeElliottWave:', e);
+            throw new Error('فشل في تحليل البيانات باستخدام أي من الطرق المتاحة');
+        }
+    } catch (e) {
+        console.error('حدث خطأ في التحليل:', e);
+        throw e;
+    }
+}
+
+// أضف هذه الدالة الجديدة بعد دالة analyzeKlineData
+function formatAnalysisResult(analysis, currentPrice) {
+    if (!analysis) {
+        return {
+            status: 'error',
+            message: 'لم يتم العثور على نتائج تحليل'
+        };
+    }
+
+    // محاولة استخراج الأنماط من النتيجة
+    const patterns = analysis.patterns || [];
+    
+    return {
+        status: 'success',
+        patterns: patterns.map(pattern => ({
+            type: pattern.type || 'غير معروف',
+            direction: pattern.direction || (pattern.endValue > pattern.startValue ? 'صاعد' : 'هابط'),
+            confidence: pattern.confidence || 50, // قيمة افتراضية
+            startIndex: pattern.startIndex || 0,
+            endIndex: pattern.endIndex || 0,
+            waveLength: pattern.waveLength || 0,
+            target: pattern.target || 0,
+            totalCandles: analysis.totalCandles || 0
+        }))
+    };
+}
         
         // دالة ترجمة أنواع الأنماط
         function translatePatternType(englishType) {
