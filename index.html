@@ -3,298 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
-
     <title>محلل موجات Elliott Wave</title>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Tajawal', sans-serif;
-        background: linear-gradient(135deg, #1e1e2f, #0f0f1a);
-        color: #f1f1f1;
-         font-size: 16px;
-         font-weight: 500;
-         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-         direction: rtl;
-    }
-
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-
-    .header {
-        text-align: center;
-        color: #ffffff;
-        margin-bottom: 30px;
-    }
-
-    .header h1 {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-        text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
-    }
-
-    .controls, .results {
-        background: #2b2b3c;
-        border-radius: 15px;
-        padding: 30px;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    }
-
-    .control-group {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-    }
-
-    .control-item {
-        flex: 1;
-        min-width: 200px;
-    }
-
-    .control-item label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: bold;
-        color: #ccc;
-    }
-
-    .control-item select,
-    .control-item input {
-        width: 100%;
-        padding: 12px;
-        border: 2px solid #444;
-        background: #1e1e2f;
-        color: #f1f1f1;
-        border-radius: 8px;
-        font-size: 16px;
-        transition: border-color 0.3s, background 0.3s;
-    }
-
-    .control-item select:focus,
-    .control-item input:focus {
-        outline: none;
-        border-color: #764ba2;
-        background: #2e2e4a;
-    }
-
-    .button-group {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-top: 20px;
-        flex-wrap: wrap;
-    }
-
-    button {
-        padding: 12px 30px;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s;
-        min-width: 150px;
-    }
-
-    .btn-primary {
-        background: linear-gradient(45deg, #764ba2, #667eea);
-        color: white;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
-
-    .btn-secondary {
-        background: #3b3b4f;
-        color: #ccc;
-        border: 2px solid #555;
-    }
-
-    .btn-secondary:hover {
-        background: #4b4b5f;
-    }
-
-    .loading {
-        text-align: center;
-        padding: 40px;
-        color: #aaa;
-    }
-
-    .spinner {
-        border: 4px solid #444;
-        border-top: 4px solid #764ba2;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 20px;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .analysis-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #444;
-    }
-
-    .symbol-info h2 {
-        color: #eee;
-        margin-bottom: 5px;
-    }
-
-    .symbol-info .price {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #4caf50;
-    }
-
-    .status-badge {
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-weight: bold;
-        text-transform: uppercase;
-        font-size: 12px;
-    }
-
-    .status-success {
-        background: #2e7d32;
-        color: #c8fdd9;
-    }
-
-    .status-error {
-        background: #c62828;
-        color: #ffdada;
-    }
-
-    .patterns-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .pattern-card {
-        background: #323246;
-        border-radius: 10px;
-        padding: 20px;
-        border-left: 5px solid #764ba2;
-    }
-
-    .pattern-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-
-    .pattern-type {
-        font-weight: bold;
-        color: #f1f1f1;
-        font-size: 1.1rem;
-    }
-
-    .confidence {
-        background: #667eea;
-        color: white;
-        padding: 4px 12px;
-        border-radius: 15px;
-        font-size: 14px;
-        font-weight: bold;
-    }
-
-    .confidence.high {
-        background: #28a745;
-    }
-
-    .confidence.medium {
-        background: #ffc107;
-        color: #222;
-    }
-
-    .confidence.low {
-        background: #dc3545;
-    }
-
-    .pattern-direction {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-
-    .direction-arrow {
-        font-size: 1.5rem;
-    }
-
-    .direction-up {
-        color: #28a745;
-    }
-
-    .direction-down {
-        color: #dc3545;
-    }
-
-    .summary-box {
-        background: #1a1a2b;
-        border-radius: 10px;
-        padding: 20px;
-        margin-top: 20px;
-        border-right: 5px solid #007bff;
-        color: #ccc;
-    }
-
-    .error-message {
-        background: #512d2d;
-        color: #ffb3b3;
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #a94442;
-        margin-top: 20px;
-    }
-
-    @media (max-width: 768px) {
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+        
         .container {
-            padding: 10px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
-
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
         .header h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-
+        
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
         .control-group {
-            flex-direction: column;
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
-
+        
+        .control-item {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .control-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .control-item select, .control-item input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .control-item select:focus, .control-item input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
         .button-group {
-            flex-direction: column;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
         }
-
+        
         button {
-            min-width: auto;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 150px;
         }
-    }
-</style>
-
-   <script src="webAPI-direct.js"></script>
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .results {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .symbol-info h2 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .symbol-info .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .patterns-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .pattern-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .pattern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .pattern-type {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .confidence {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .confidence.high {
+            background: #28a745;
+        }
+        
+        .confidence.medium {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .confidence.low {
+            background: #dc3545;
+        }
+        
+        .pattern-direction {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .direction-arrow {
+            font-size: 1.5rem;
+        }
+        
+        .direction-up {
+            color: #28a745;
+        }
+        
+        .direction-down {
+            color: #dc3545;
+        }
+        
+        .summary-box {
+            background: #e7f3ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-right: 5px solid #007bff;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .control-group {
+                flex-direction: column;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                min-width: auto;
+            }
+        }
+    </style>
+    <script src="webAPI.js"></script>
     <script src="elliottWaveAnalyzer.js"></script>
 </head>
 <body>
@@ -364,18 +360,18 @@
         let isAnalyzing = false;
         
         // حساب عدد الشموع المثلى حسب الفريم (تحليل 24 ساعة)
-       function getOptimalCandleCount(interval) {
-    const candleCounts = {
-        '15m': 200, 
-        '30m': 300,  
-        '1h': 400,   
-        '4h': 200,    
-        '1d': 100,    
-        '1w': 20      
-    };
-    return candleCounts[interval] || 300; // رقم افتراضي لو الإطار غير موجود
-}
-
+        function getOptimalCandleCount(interval) {
+            const candleCounts = {
+                '15m': 96,   // 24 ساعة ÷ 15 دقيقة = 96
+                '30m': 48,   // 24 ساعة ÷ 30 دقيقة = 48
+                '1h': 24,    // 24 ساعة ÷ 1 ساعة = 24
+                '4h': 6,     // 24 ساعة ÷ 4 ساعات = 6
+                '1d': 1,     // 1 يوم
+                '1w': 1      // 1 أسبوع
+            };
+            
+            return candleCounts[interval] || 24;
+        }
         
         // تحديث عدد الشموع عند تغيير الفريم
         document.getElementById('intervalSelect').addEventListener('change', function() {
@@ -489,8 +485,8 @@
                                     <p><strong>📍 نقطة البداية:</strong> الشمعة رقم ${pattern.startIndex} (من ${pattern.totalCandles} شمعة)</p>
                                     <p><strong>🏁 نقطة النهاية:</strong> الشمعة رقم ${pattern.endIndex} (من ${pattern.totalCandles} شمعة)</p>
                                     <p><strong>📏 المدة الزمنية:</strong> ${pattern.endIndex - pattern.startIndex} شمعة</p>
-<p><strong>📏 طول الموجة:</strong> ${(parseFloat(pattern.waveLength) || 0).toFixed(2)}%</p>
-<p><strong>🎯 الهدف المتوقع:</strong> $${(parseFloat(pattern.target) || 0).toFixed(4)}</p>
+                                    <p><strong>📊 طول الموجة:</strong> ${pattern.waveLength.toFixed(2)}%</p>
+                                    <p><strong>🎯 الهدف المتوقع:</strong> $${pattern.target}</p>
                                 </div>
                             </div>
                         `).join('')}
@@ -595,157 +591,126 @@
             }
         }
         
-      // دالة تحليل بيانات الشموع باستخدام المحلل الأصلي Elliott Wave
-function analyzeKlineData(klineData, realCurrentPrice) {
-    if (!klineData || klineData.length < 10) {
-        return [];
-    }
-    
-    try {
-        // إنشاء instance من المحلل الأصلي
-        const analyzer = new ElliottWaveAnalyzer();
-        
-        // تحويل بيانات الشموع للصيغة المطلوبة مع معالجة الأخطاء
-        const priceData = klineData.map((candle, index) => {
-            // التأكد من صحة البيانات
-            const open = parseFloat(candle[1]) || 0;
-            const high = parseFloat(candle[2]) || 0;
-            const low = parseFloat(candle[3]) || 0;
-            const close = parseFloat(candle[4]) || 0;
-            const volume = parseFloat(candle[5]) || 0;
-            
-            return {
-                index: index,
-                timestamp: parseInt(candle[0]) || Date.now(),
-                open: open,
-                high: Math.max(open, high, close, low),
-                low: Math.min(open, high, close, low),
-                close: close,
-                volume: volume
-            };
-        });
-        
-        // التأكد من وجود سعر حالي صالح
-        const lastCandle = priceData[priceData.length - 1];
-        const currentPrice = (realCurrentPrice && !isNaN(realCurrentPrice)) ? 
-            realCurrentPrice : 
-            (lastCandle ? lastCandle.close : 0);
-            
-        const totalCandles = priceData.length;
-        
-        // استدعاء الدالة مع معالجة الأخطاء
-        let analysisResults;
-        try {
-            analysisResults = analyzer.analyze(priceData);
-        } catch (e) {
-            console.error('خطأ في تحليل البيانات:', e);
-            analysisResults = { patterns: [] };
-        }
-        
-        // تحويل النتائج للصيغة المطلوبة في الواجهة
-        const patterns = [];
-        
-if (analysisResults && analysisResults.patterns && analysisResults.patterns.length > 0) {
-    analysisResults.patterns.forEach(pattern => {
-        try {
-            // حساب النقاط العليا والدنيا للنمط
-            const points = pattern.points || [];
-            let startPrice = points[0]?.price || 0;
-            let endPrice = points[points.length - 1]?.price || 0;
-            
-            // إذا كانت النقاط غير متوفرة، استخدم سعر الافتتاح والإغلاق
-            if (points.length === 0 && priceData.length > 0) {
-                startPrice = priceData[0].open;
-                endPrice = priceData[priceData.length - 1].close;
+        // دالة تحليل بيانات الشموع باستخدام المحلل الأصلي Elliott Wave
+        function analyzeKlineData(klineData, realCurrentPrice) {
+            if (!klineData || klineData.length < 10) {
+                return [];
             }
             
-            // حساب طول الموجة كنسبة مئوية
-            const priceChange = Math.abs(endPrice - startPrice);
-            const waveLength = (priceChange / startPrice) * 100;
-            
-            // حساب الهدف المتوقع
-            let target;
-            if (pattern.direction === 'صاعد') {
-                target = endPrice + (priceChange * 0.618); // هدف تصاعدي
-            } else {
-                target = endPrice - (priceChange * 0.382); // هدف تنازلي
-            }
-            
-            // التأكد من صحة القيم
-            const confidence = Math.min(100, Math.max(0, 
-                (pattern.confidence && !isNaN(pattern.confidence)) ? 
-                parseFloat(pattern.confidence) : 70
-            ));
-            
-            patterns.push({
-                type: translatePatternType(pattern.type) || 'موجة دافعة',
-                direction: pattern.direction || (endPrice >= startPrice ? 'صاعد' : 'هابط'),
-                confidence: confidence,
-                startIndex: Math.max(1, pattern.startIndex || 1),
-                endIndex: Math.min(totalCandles - 1, pattern.endIndex || totalCandles - 1),
-                waveLength: waveLength,
-                target: target,
-                totalCandles: totalCandles
-            });
-        } catch (e) {
-            console.error('خطأ في معالجة النمط:', e);
-        }
-    });
-}
-        
-        // ترتيب الأنماط حسب مستوى الثقة
-        return patterns
-            .sort((a, b) => (b.confidence || 0) - (a.confidence || 0))
-            .slice(0, 3); // أقوى 3 أنماط
-            
-    } catch (error) {
-        console.error('خطأ في المحلل الأصلي:', error);
-        
-        try {
-            // fallback للتحليل المبسط في حالة الخطأ
-            const prices = klineData
-                .map(candle => parseFloat(candle[4]))
-                .filter(price => !isNaN(price));
+            try {
+                // إنشاء instance من المحلل الأصلي
+                const analyzer = new ElliottWaveAnalyzer();
                 
-            if (prices.length > 1) {
-                const currentPrice = (realCurrentPrice && !isNaN(realCurrentPrice)) ? 
-                    realCurrentPrice : prices[prices.length - 1];
+                // تحويل بيانات الشموع للصيغة المطلوبة
+                const priceData = klineData.map((candle, index) => ({
+                    index: index,
+                    timestamp: parseInt(candle[0]),
+                    open: parseFloat(candle[1]),
+                    high: parseFloat(candle[2]),
+                    low: parseFloat(candle[3]),
+                    close: parseFloat(candle[4]),
+                    volume: parseFloat(candle[5])
+                }));
+                
+                const currentPrice = realCurrentPrice || priceData[priceData.length - 1].close;
+                const totalCandles = klineData.length;
+                
+                // تشغيل التحليل الأصلي
+                const analysisResults = analyzer.analyzeMarketData(priceData);
+                
+                // تحويل النتائج للصيغة المطلوبة في الواجهة
+                const patterns = [];
+                
+                if (analysisResults && analysisResults.patterns) {
+                    analysisResults.patterns.forEach(pattern => {
+                        // تحديد الاتجاه بناءً على نوع الموجة
+                        let direction = 'صاعد';
+                        if (pattern.type && (pattern.type.includes('correction') || 
+                            pattern.type.includes('تصحيح') || 
+                            pattern.points && pattern.points.length >= 2 &&
+                            pattern.points[pattern.points.length - 1].price < pattern.points[0].price)) {
+                            direction = 'هابط';
+                        }
+                        
+                        // حساب الهدف المتوقع
+                        let target = currentPrice;
+                        if (pattern.projections && pattern.projections.length > 0) {
+                            target = pattern.projections[0].price;
+                        } else {
+                            // حساب تقريبي للهدف
+                            const waveLength = pattern.waveLength || 0.05;
+                            target = direction === 'صاعد' ? 
+                                (currentPrice * (1 + waveLength)).toFixed(4) :
+                                (currentPrice * (1 - waveLength)).toFixed(4);
+                        }
+                        
+                        patterns.push({
+                            type: translatePatternType(pattern.type) || 'موجة دافعة',
+                            direction: direction,
+                            confidence: pattern.confidence || 70,
+                            startIndex: pattern.startIndex || 1,
+                            endIndex: pattern.endIndex || totalCandles - 1,
+                            waveLength: (pattern.waveLength || 0.05) * 100,
+                            target: target.toString(),
+                            totalCandles: totalCandles
+                        });
+                    });
+                }
+                
+                // إذا لم يجد المحلل أنماط، أنشئ نمط اتجاه عام
+                if (patterns.length === 0) {
+                    const prices = priceData.map(d => d.close);
+                    const firstPrice = prices[0];
+                    const lastPrice = prices[prices.length - 1];
+                    const trendDirection = lastPrice > firstPrice ? 'صاعد' : 'هابط';
+                    const trendStrength = Math.abs(lastPrice - firstPrice) / firstPrice;
+                    
+                    patterns.push({
+                        type: trendDirection === 'صاعد' ? 'موجة دافعة' : 'موجة تصحيحية',
+                        direction: trendDirection,
+                        confidence: Math.min(85, 60 + (trendStrength * 300)),
+                        startIndex: 1,
+                        endIndex: totalCandles - 1,
+                        waveLength: trendStrength * 100,
+                        target: trendDirection === 'صاعد' ? 
+                            (currentPrice * (1 + trendStrength * 0.5)).toFixed(4) :
+                            (currentPrice * (1 - trendStrength * 0.5)).toFixed(4),
+                        totalCandles: totalCandles
+                    });
+                }
+                
+                // ترتيب الأنماط حسب مستوى الثقة
+                return patterns
+                    .sort((a, b) => b.confidence - a.confidence)
+                    .slice(0, 3); // أقوى 3 أنماط
+                    
+            } catch (error) {
+                console.error('خطأ في المحلل الأصلي:', error);
+                
+                // fallback للتحليل المبسط في حالة الخطأ
+                const prices = klineData.map(candle => parseFloat(candle[4]));
+                const currentPrice = realCurrentPrice || prices[prices.length - 1];
                 const totalCandles = klineData.length;
                 const firstPrice = prices[0];
                 const lastPrice = prices[prices.length - 1];
                 const trendDirection = lastPrice > firstPrice ? 'صاعد' : 'هابط';
-                const trendStrength = Math.min(0.5, Math.abs(lastPrice - firstPrice) / firstPrice);
+                const trendStrength = Math.abs(lastPrice - firstPrice) / firstPrice;
                 
                 return [{
                     type: trendDirection === 'صاعد' ? 'موجة دافعة' : 'موجة تصحيحية',
                     direction: trendDirection,
-                    confidence: 70,
+                    confidence: Math.min(85, 60 + (trendStrength * 300)),
                     startIndex: 1,
                     endIndex: totalCandles - 1,
-                    waveLength: (trendStrength * 100).toFixed(2),
+                    waveLength: trendStrength * 100,
                     target: trendDirection === 'صاعد' ? 
                         (currentPrice * (1 + trendStrength * 0.5)).toFixed(4) :
                         (currentPrice * (1 - trendStrength * 0.5)).toFixed(4),
                     totalCandles: totalCandles
                 }];
             }
-        } catch (e) {
-            console.error('خطأ في معالجة الخطأ الافتراضي:', e);
         }
         
-        // إرجاع قيم افتراضية في حالة الفشل الكامل
-        return [{
-            type: 'غير معروف',
-            direction: 'محايد',
-            confidence: 50,
-            startIndex: 1,
-            endIndex: 10,
-            waveLength: '0.00',
-            target: '0.0000',
-            totalCandles: 10
-        }];
-    }
-}
         // دالة ترجمة أنواع الأنماط
         function translatePatternType(englishType) {
             const translations = {
