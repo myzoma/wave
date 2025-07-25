@@ -2,7 +2,7 @@
 class WebBinanceAPI {
     constructor() {
        this.proxyURL = 'https://corsproxy.io/?';
-const url = `${this.proxyURL}https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT`;
+const url = `${this.proxyURL}https://api1.binance.com/api/v3/ticker/price?symbol=BTCUSDT`;
 
     }
 
