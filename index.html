@@ -591,72 +591,82 @@
             }
         }
         
-      async function analyzeKlineData(klineData, realCurrentPrice) {
-    console.log('بدء تحليل البيانات...');
-    const analyzer = new ElliottWaveAnalyzer();
-    
-    // تحويل البيانات للصيغة المطلوبة
-    const priceData = klineData.map((candle, index) => ({
-        time: candle[0],
-        open: parseFloat(candle[1]),
-        high: parseFloat(candle[2]),
-        low: parseFloat(candle[3]),
-        close: parseFloat(candle[4]),
-        volume: parseFloat(candle[5])
-    }));
+     function analyzeKlineData(klineData, realCurrentPrice) {
+    if (!klineData || klineData.length < 10) {
+        return [];
+    }
     
     try {
-        // المحاولة مع الدالة analyze أولاً
-        try {
-            console.log('جاري التحليل باستخدام analyzer.analyze...');
-            const result = await analyzer.analyze(priceData);
-            console.log('نتيجة analyze:', result);
-            return formatAnalysisResult(result, realCurrentPrice);
-        } catch (e) {
-            console.warn('فشل analyze، جرب analyzeElliottWave...', e);
+        const analyzer = new ElliottWaveAnalyzer();
+        
+        const priceData = klineData.map((candle, index) => ({
+            index: index,
+            timestamp: parseInt(candle[0]),
+            open: parseFloat(candle[1]),
+            high: parseFloat(candle[2]),
+            low: parseFloat(candle[3]),
+            close: parseFloat(candle[4]),
+            volume: parseFloat(candle[5])
+        }));
+        
+        const currentPrice = realCurrentPrice || priceData[priceData.length - 1].close;
+        const totalCandles = klineData.length;
+        
+        // 1. جرب الدوال المتاحة بالترتيب
+        let analysisResults;
+        if (typeof analyzer.analyze === 'function') {
+            console.log('جرب استخدام analyzer.analyze...');
+            analysisResults = analyzer.analyze(priceData);
+        } else if (typeof analyzer.analyzeElliottWave === 'function') {
+            console.log('جرب استخدام analyzer.analyzeElliottWave...');
+            analysisResults = analyzer.analyzeElliottWave(priceData);
+        } else if (typeof analyzer.analyzeWavePatterns === 'function') {
+            console.log('جرب استخدام analyzer.analyzeWavePatterns...');
+            analysisResults = analyzer.analyzeWavePatterns(priceData);
+        } else {
+            throw new Error('لم يتم العثور على دالة تحليل مناسبة');
         }
         
-        // إذا فشلت، جرب analyzeElliottWave
-        try {
-            console.log('جاري التحليل باستخدام analyzer.analyzeElliottWave...');
-            const result = await analyzer.analyzeElliottWave(priceData);
-            console.log('نتيجة analyzeElliottWave:', result);
-            return formatAnalysisResult(result, realCurrentPrice);
-        } catch (e) {
-            console.error('فشل analyzeElliottWave:', e);
-            throw new Error('فشل في تحليل البيانات باستخدام أي من الطرق المتاحة');
+        console.log('نتيجة التحليل الخام:', analysisResults);
+        
+        // 2. معالجة النتائج
+        let patterns = [];
+        if (Array.isArray(analysisResults)) {
+            patterns = analysisResults;
+        } else if (analysisResults && Array.isArray(analysisResults.patterns)) {
+            patterns = analysisResults.patterns;
+        } else if (analysisResults) {
+            patterns = [analysisResults];
         }
-    } catch (e) {
-        console.error('حدث خطأ في التحليل:', e);
-        throw e;
-    }
-}
-
-// أضف هذه الدالة الجديدة بعد دالة analyzeKlineData
-function formatAnalysisResult(analysis, currentPrice) {
-    if (!analysis) {
+        
+        // 3. التحقق من صحة الأنماط قبل الفرز
+        if (!Array.isArray(patterns)) {
+            patterns = [];
+        }
+        
+        // 4. إرجاع النتائج بالشكل المتوقع
+        return {
+            status: 'success',
+            patterns: patterns.map(p => ({
+                type: p.type || 'غير معروف',
+                direction: p.direction || (p.endValue > p.startValue ? 'صاعد' : 'هابط'),
+                confidence: p.confidence || 50,
+                startIndex: p.startIndex || 0,
+                endIndex: p.endIndex || 0,
+                waveLength: p.waveLength || 0,
+                target: p.target || 0,
+                totalCandles: totalCandles
+            }))
+        };
+        
+    } catch (error) {
+        console.error('حدث خطأ في التحليل:', error);
         return {
             status: 'error',
-            message: 'لم يتم العثور على نتائج تحليل'
+            message: 'حدث خطأ في تحليل البيانات: ' + error.message
         };
     }
-
-    // محاولة استخراج الأنماط من النتيجة
-    const patterns = analysis.patterns || [];
-    
-    return {
-        status: 'success',
-        patterns: patterns.map(pattern => ({
-            type: pattern.type || 'غير معروف',
-            direction: pattern.direction || (pattern.endValue > pattern.startValue ? 'صاعد' : 'هابط'),
-            confidence: pattern.confidence || 50, // قيمة افتراضية
-            startIndex: pattern.startIndex || 0,
-            endIndex: pattern.endIndex || 0,
-            waveLength: pattern.waveLength || 0,
-            target: pattern.target || 0,
-            totalCandles: analysis.totalCandles || 0
-        }))
-    };
+}
 }
         
         // دالة ترجمة أنواع الأنماط
