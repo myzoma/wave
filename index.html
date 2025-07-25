@@ -3,140 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محلل موجات إليوت - Elliott Wave Analyzer</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind-rtl.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>محلل بسيط</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
-        
         body {
-            font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            color: #e6e6e6;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
-        
-        .gradient-text {
-            background: linear-gradient(90deg, #4f46e5, #06b6d4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:disabled {
+            background: #cccccc;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 50px;
         }
     </style>
 </head>
-<body class="p-4 md:p-6">
-    <div class="container mx-auto max-w-6xl">
-        <!-- Header -->
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold mb-2 gradient-text">
-                <i class="fas fa-wave-square mr-2"></i>محلل موجات إليوت
-            </h1>
-            <p class="text-gray-400">تحليل فني متقدم للأسواق المالية باستخدام نظرية موجات إليوت</p>
-        </header>
-
-        <!-- Main Content -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <!-- Control Panel -->
-            <div class="lg:col-span-1">
-                <div class="card rounded-xl p-6 h-full">
-                    <h2 class="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">
-                        <i class="fas fa-sliders-h ml-2"></i>إعدادات التحليل
-                    </h2>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">الرمز المالي</label>
-                            <select id="symbolSelect" class="w-full bg-gray-800 text-white rounded-lg p-2 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="BTCUSDT">Bitcoin (BTC/USDT)</option>
-                                <option value="ETHUSDT">Ethereum (ETH/USDT)</option>
-                                <option value="SOLUSDT">Solana (SOL/USDT)</option>
-                                <option value="XRPUSDT">Ripple (XRP/USDT)</option>
-                                <option value="ADAUSDT">Cardano (ADA/USDT)</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">الفترة الزمنية</label>
-                            <select id="intervalSelect" class="w-full bg-gray-800 text-white rounded-lg p-2 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="15m">15 دقيقة</option>
-                                <option value="30m">30 دقيقة</option>
-                                <option value="1h" selected>ساعة</option>
-                                <option value="4h">4 ساعات</option>
-                                <option value="1d">يوم</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1">عدد الشموع</label>
-                            <input type="number" id="candleCount" value="100" min="50" max="500" 
-                                   class="w-full bg-gray-800 text-white rounded-lg p-2 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        
-                        <div class="pt-2 space-y-2">
-                            <button id="analyzeBtn" 
-                                    class="w-full py-3 px-4 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 transition flex items-center justify-center">
-                                <i class="fas fa-play ml-2"></i>بدء التحليل
-                            </button>
-                            
-                            <button id="stopBtn"
-                                    class="w-full py-3 px-4 rounded-lg font-medium bg-gray-700 text-white hover:bg-gray-600 transition flex items-center justify-center">
-                                <i class="fas fa-stop ml-2"></i>إيقاف
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="status" class="mt-6 p-3 rounded-lg bg-gray-800 text-sm text-center hidden">
-                        <i class="fas fa-circle-notch fa-spin mr-1"></i>
-                        <span>جاري التحميل...</span>
-                    </div>
-                </div>
-            </div>
+<body>
+    <div class="container">
+        <h1>محلل بسيط</h1>
+        
+        <div>
+            <select id="symbol">
+                <option value="BTCUSDT">BTC/USDT</option>
+                <option value="ETHUSDT">ETH/USDT</option>
+            </select>
             
-            <!-- Results Panel -->
-            <div class="lg:col-span-3">
-                <!-- Price Info Card -->
-                <div class="card rounded-xl p-6 mb-6">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                        <div>
-                            <h2 id="symbolTitle" class="text-2xl font-bold text-white">-</h2>
-                            <p id="priceInfo" class="text-3xl font-bold mt-1">$0.00</p>
-                        </div>
-                        <div id="marketStatus" class="mt-3 md:mt-0">
-                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-gray-800">جاري التحميل...</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Analysis Results -->
-                <div id="analysisResults" class="space-y-4">
-                    <div class="card rounded-xl p-6 text-center">
-                        <div class="text-gray-400 mb-4">
-                            <i class="fas fa-wave-square text-4xl opacity-30"></i>
-                            <p class="mt-2">سيظهر تحليل موجات إليوت هنا بعد تشغيل التحليل</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <select id="interval">
+                <option value="1h">1 ساعة</option>
+                <option value="4h">4 ساعات</option>
+                <option value="1d">يوم</option>
+            </select>
+            
+            <button onclick="startAnalysis()">تحليل</button>
+            <button onclick="stopAnalysis()">إيقاف</button>
         </div>
         
-        <!-- Footer -->
-        <footer class="mt-12 text-center text-gray-500 text-sm">
-            <p>تم التطوير باستخدام ElliottWaveAnalyzer &copy; 2023</p>
-        </footer>
+        <div id="status">جاهز</div>
+        <div id="result"></div>
     </div>
 
-    <!-- Scripts -->
-    <script src="elliottWaveAnalyzer.js"></script>
-    <script src="webAPI-direct.js"></script>
     <script>
-        // JavaScript code from previous response goes here
-        // [Previous JavaScript code should be placed here]
+        let analysisInterval = null;
+
+        async function startAnalysis() {
+            const symbol = document.getElementById('symbol').value;
+            const interval = document.getElementById('interval').value;
+            
+            updateStatus('جاري التحليل...');
+            
+            try {
+                const analyzer = new ElliottWaveAnalyzer();
+                const binanceAPI = new WebBinanceAPI();
+                
+                // Get data
+                const klineData = await binanceAPI.getKlineData(symbol, interval, 100);
+                const currentPrice = await binanceAPI.getCurrentPrice(symbol);
+                
+                // Simple analysis
+                const result = await simpleAnalyze(klineData, currentPrice);
+                displayResult(result);
+                
+                // Update price every 30 seconds
+                analysisInterval = setInterval(async () => {
+                    const newPrice = await binanceAPI.getCurrentPrice(symbol);
+                    document.getElementById('result').innerHTML += `<div>تحديث السعر: $${newPrice}</div>`;
+                }, 30000);
+                
+                updateStatus('تم التحليل بنجاح');
+                
+            } catch (error) {
+                updateStatus('خطأ: ' + (error.message || 'حدث خطأ غير متوقع'));
+                console.error(error);
+            }
+        }
+
+        function stopAnalysis() {
+            if (analysisInterval) {
+                clearInterval(analysisInterval);
+                analysisInterval = null;
+                updateStatus('تم إيقاف التحديث التلقائي');
+            }
+        }
+
+        async function simpleAnalyze(klineData, currentPrice) {
+            if (!klineData || klineData.length < 2) {
+                return 'لا توجد بيانات كافية للتحليل';
+            }
+            
+            const lastClose = parseFloat(klineData[klineData.length - 1][4]);
+            const prevClose = parseFloat(klineData[klineData.length - 2][4]);
+            const change = ((lastClose - prevClose) / prevClose) * 100;
+            
+            return {
+                price: lastClose.toFixed(2),
+                change: change.toFixed(2) + '%',
+                trend: change >= 0 ? 'صاعد' : 'هابط'
+            };
+        }
+
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+
+        function displayResult(result) {
+            if (typeof result === 'string') {
+                document.getElementById('result').innerHTML = result;
+                return;
+            }
+            
+            document.getElementById('result').innerHTML = `
+                <div>السعر الحالي: $${result.price}</div>
+                <div>التغيير: <span style="color: ${result.change >= 0 ? 'green' : 'red'}">${result.change}</span></div>
+                <div>الاتجاه: ${result.trend}</div>
+            `;
+        }
     </script>
+     <script src="webAPI-direct.js"></script>
+    <script src="elliottWaveAnalyzer.js"></script>
 </body>
 </html>
