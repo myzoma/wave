@@ -1,7 +1,7 @@
-// Web API مع روابط Binance المباشرة
+// Web API متوافق مع ElliottWaveAnalyzer
 class WebBinanceAPI {
     constructor() {
-        // روابط بديلة لـ Binance API بدون قيود CORS
+        // استخدام روابط Binance المباشرة
         this.endpoints = [
             'https://api1.binance.com',
             'https://api2.binance.com',
@@ -9,7 +9,6 @@ class WebBinanceAPI {
             'https://api4.binance.com'
         ];
         this.currentEndpointIndex = 0;
-        console.log('تم تهيئة WebBinanceAPI مع روابط مباشرة');
     }
 
     // الحصول على الرابط الحالي
@@ -57,27 +56,38 @@ class WebBinanceAPI {
         throw lastError || new Error('فشل جميع محاولات الاتصال');
     }
 
-    // الحصول على بيانات الشموع
+    // الحصول على بيانات الشموع - متوافق مع ElliottWaveAnalyzer
     async getKlineData(symbol = 'BTCUSDT', interval = '1h', limit = 100) {
         try {
-            console.log(`جاري الحصول على بيانات ${symbol} - ${interval} - ${limit} شمعة`);
-            
-            return await this.fetchWithRetry('/api/v3/klines', {
+            const klines = await this.fetchWithRetry('/api/v3/klines', {
                 symbol: symbol.toUpperCase(),
                 interval: interval,
                 limit: limit.toString()
             });
+
+            // تحويل البيانات إلى التنسيق المتوقع من قبل ElliottWaveAnalyzer
+            return klines.map(k => ({
+                time: k[0] / 1000, // تحويل من مللي ثانية إلى ثواني
+                open: parseFloat(k[1]),
+                high: parseFloat(k[2]),
+                low: parseFloat(k[3]),
+                close: parseFloat(k[4]),
+                volume: parseFloat(k[5]),
+                closeTime: k[6] / 1000, // تحويل من مللي ثانية إلى ثواني
+                quoteAssetVolume: parseFloat(k[7]),
+                numberOfTrades: k[8],
+                takerBuyBaseAssetVolume: parseFloat(k[9]),
+                takerBuyQuoteAssetVolume: parseFloat(k[10])
+            }));
         } catch (error) {
             console.error('خطأ في الحصول على بيانات الشموع:', error);
-            throw new Error('فشل الحصول على بيانات التداول. يرجى المحاولة لاحقاً');
+            throw new Error('فشل الحصول على بيانات التداول');
         }
     }
 
     // الحصول على السعر الحالي
     async getCurrentPrice(symbol = 'BTCUSDT') {
         try {
-            console.log(`جاري الحصول على السعر الحالي لـ ${symbol}`);
-            
             const data = await this.fetchWithRetry('/api/v3/ticker/price', {
                 symbol: symbol.toUpperCase()
             });
@@ -89,17 +99,25 @@ class WebBinanceAPI {
         }
     }
 
+    // دالة مساعدة لتحويل البيانات إلى صيغة OHLCV
+    formatOHLCV(data) {
+        return data.map(item => ({
+            time: item.time,
+            open: item.open,
+            high: item.high,
+            low: item.low,
+            close: item.close,
+            volume: item.volume
+        }));
+    }
+
     // اختبار الاتصال
     async testConnection() {
         try {
-            console.log('جاري اختبار الاتصال بـ Binance API');
-            
             await this.fetchWithRetry('/api/v3/ping');
-            console.log('✓ تم الاتصال بـ Binance API بنجاح');
-            
             return { 
                 status: 'success', 
-                message: 'تم الاتصال بنجاح' 
+                message: 'تم الاتصال بـ Binance API بنجاح' 
             };
         } catch (error) {
             console.error('فشل اختبار الاتصال:', error);
