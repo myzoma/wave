@@ -645,92 +645,53 @@ function analyzeKlineData(klineData, realCurrentPrice) {
         // تحويل النتائج للصيغة المطلوبة في الواجهة
         const patterns = [];
         
-        if (analysisResults && analysisResults.patterns && Array.isArray(analysisResults.patterns)) {
-            analysisResults.patterns.forEach(pattern => {
-                try {
-                    // تحديد الاتجاه بناءً على نوع الموجة
-                    let direction = 'صاعد';
-                    if (pattern.type && (
-                        pattern.type.toLowerCase().includes('correction') || 
-                        pattern.type.includes('تصحيح') || 
-                        (pattern.points && pattern.points.length >= 2 &&
-                        pattern.points[pattern.points.length - 1].price < pattern.points[0].price)
-                    )) {
-                        direction = 'هابط';
-                    }
-                    
-                    // حساب طول الموجة
-                    let waveLength = 0.05; // القيمة الافتراضية
-                    if (pattern.waveLength && !isNaN(pattern.waveLength)) {
-                        waveLength = Math.min(Math.max(0.01, Math.abs(parseFloat(pattern.waveLength))), 1);
-                    }
-                    
-                    // حساب الهدف المتوقع
-                    let target = currentPrice;
-                    if (pattern.projections && pattern.projections.length > 0 && 
-                        pattern.projections[0].price && !isNaN(pattern.projections[0].price)) {
-                        target = parseFloat(pattern.projections[0].price);
-                    } else {
-                        // حساب تقريبي للهدف بناءً على اتجاه الموجة
-                        const targetMultiplier = direction === 'صاعد' ? (1 + waveLength) : (1 - waveLength);
-                        target = currentPrice * targetMultiplier;
-                    }
-                    
-                    // التأكد من صحة القيم
-                    const confidence = Math.min(100, Math.max(0, 
-                        (pattern.confidence && !isNaN(pattern.confidence)) ? 
-                        parseFloat(pattern.confidence) : 70
-                    ));
-                    
-                    patterns.push({
-                        type: translatePatternType(pattern.type) || 'موجة دافعة',
-                        direction: direction,
-                        confidence: confidence,
-                        startIndex: Math.max(0, 
-                            (pattern.startIndex && !isNaN(pattern.startIndex)) ? 
-                            parseInt(pattern.startIndex) : 1
-                        ),
-                        endIndex: Math.min(totalCandles - 1, 
-                            (pattern.endIndex && !isNaN(pattern.endIndex)) ? 
-                            parseInt(pattern.endIndex) : totalCandles - 1
-                        ),
-                        waveLength: (waveLength * 100).toFixed(2),
-                        target: target.toFixed(4),
-                        totalCandles: totalCandles
-                    });
-                } catch (e) {
-                    console.error('خطأ في معالجة النمط:', e);
-                }
-            });
-        }
-        
-        // إذا لم يجد المحلل أنماط، أنشئ نمط اتجاه عام
-        if (patterns.length === 0) {
-            try {
-                const prices = priceData.map(d => d.close).filter(p => !isNaN(p));
-                if (prices.length > 1) {
-                    const firstPrice = prices[0];
-                    const lastPrice = prices[prices.length - 1];
-                    const trendDirection = lastPrice > firstPrice ? 'صاعد' : 'هابط';
-                    const trendStrength = Math.min(0.5, Math.abs(lastPrice - firstPrice) / firstPrice);
-                    
-                    patterns.push({
-                        type: trendDirection === 'صاعد' ? 'موجة دافعة' : 'موجة تصحيحية',
-                        direction: trendDirection,
-                        confidence: Math.min(85, 60 + (trendStrength * 300)),
-                        startIndex: 1,
-                        endIndex: totalCandles - 1,
-                        waveLength: (trendStrength * 100).toFixed(2),
-                        target: trendDirection === 'صاعد' ? 
-                            (currentPrice * (1 + trendStrength * 0.5)).toFixed(4) :
-                            (currentPrice * (1 - trendStrength * 0.5)).toFixed(4),
-                        totalCandles: totalCandles
-                    });
-                }
-            } catch (e) {
-                console.error('خطأ في إنشاء النمط الافتراضي:', e);
+if (analysisResults && analysisResults.patterns && analysisResults.patterns.length > 0) {
+    analysisResults.patterns.forEach(pattern => {
+        try {
+            // حساب النقاط العليا والدنيا للنمط
+            const points = pattern.points || [];
+            let startPrice = points[0]?.price || 0;
+            let endPrice = points[points.length - 1]?.price || 0;
+            
+            // إذا كانت النقاط غير متوفرة، استخدم سعر الافتتاح والإغلاق
+            if (points.length === 0 && priceData.length > 0) {
+                startPrice = priceData[0].open;
+                endPrice = priceData[priceData.length - 1].close;
             }
+            
+            // حساب طول الموجة كنسبة مئوية
+            const priceChange = Math.abs(endPrice - startPrice);
+            const waveLength = (priceChange / startPrice) * 100;
+            
+            // حساب الهدف المتوقع
+            let target;
+            if (pattern.direction === 'صاعد') {
+                target = endPrice + (priceChange * 0.618); // هدف تصاعدي
+            } else {
+                target = endPrice - (priceChange * 0.382); // هدف تنازلي
+            }
+            
+            // التأكد من صحة القيم
+            const confidence = Math.min(100, Math.max(0, 
+                (pattern.confidence && !isNaN(pattern.confidence)) ? 
+                parseFloat(pattern.confidence) : 70
+            ));
+            
+            patterns.push({
+                type: translatePatternType(pattern.type) || 'موجة دافعة',
+                direction: pattern.direction || (endPrice >= startPrice ? 'صاعد' : 'هابط'),
+                confidence: confidence,
+                startIndex: Math.max(1, pattern.startIndex || 1),
+                endIndex: Math.min(totalCandles - 1, pattern.endIndex || totalCandles - 1),
+                waveLength: waveLength,
+                target: target,
+                totalCandles: totalCandles
+            });
+        } catch (e) {
+            console.error('خطأ في معالجة النمط:', e);
         }
+    });
+}
         
         // ترتيب الأنماط حسب مستوى الثقة
         return patterns
